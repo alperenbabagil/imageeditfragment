@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'photoeditor'
+
+    publishedGroupId = 'ja.burhanrashid52'
+    libraryName = 'PhotoEditor'
+    artifact = 'photoeditor'
+
+    libraryDescription = 'A Photo Editor library to edit image using paints,text,emoji and images'
+
+    siteUrl = 'https://github.com/burhanrashid52/PhotoEditor'
+    gitUrl = 'https://github.com/burhanrashid52/PhotoEditor'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'burhanrashid52'
+    developerName = 'Burhanuddin Rashid'
+    developerEmail = 'burhanrashid5253@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+
+android {
+    compileSdkVersion 28
+
+
+
+    defaultConfig {
+
+        minSdkVersion 19
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
+    androidTestImplementation 'junit:junit:4.12'
+    implementation 'com.github.blennerSilva:AwesomeDialog:2.0.5'
+}
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

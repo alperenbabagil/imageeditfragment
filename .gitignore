@@ -1,0 +1,64 @@
+*.pyc
+telepath_web/.idea/
+telepath_web/telepath/uploads/
+telepath_web/.vagrant/
+
+telepath_web/ubuntu-xenial-16.04-cloudimg-console.log
+
+
+
+
+
+# Built application files
+/*/build/
+
+# Crashlytics configuations
+com_crashlytics_export_strings.xml
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Gradle generated files
+.gradle/
+
+# Signing files
+.signing/
+
+# User-specific configurations
+/*.idea/libraries/
+/*.idea/workspace.xml
+/*.idea/tasks.xml
+/*.idea/.name
+/*.idea/compiler.xml
+/*.idea/copyright/profiles_settings.xml
+/*.idea/encodings.xml
+/*.idea/misc.xml
+/*.idea/modules.xml
+/*.idea/scopes/scope_settings.xml
+/*.idea/vcs.xml
+/*.idea/caches/
+*.iml
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/dataSources.local.xml
+.idea/dataSources/
+.idea/inspectionProfiles/
+
+/.gradle/
+/.idea/
+/app/build/
+/app/release/
+/photoeditor/build/
+/.idea/codeStyles/
+/.idea/codeStyles/Project.xml
+/.idea/gradle.xml
+/.idea/runConfigurations.xml
+/.idea/libraries/
+!/app/google-services.json
