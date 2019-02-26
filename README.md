@@ -11,6 +11,11 @@ It is more like wrapper to [@burhanrashid52]'s [PhotoEditor] library. It ads cha
 
 It is developed for [Telepath] project of [Virasoft] and made public to contribute open-source. UI mostly designed by [@safakurt]
 
+### Screenshots
+![Initial mode](https://github.com/alperenbabagil/imageeditfragment/blob/master/screenshots/tutor1.PNG)
+
+![Drawing mode](https://github.com/alperenbabagil/imageeditfragment/blob/master/screenshots/tutor2.PNG)
+
 ### Installation
 
 ### Usage
