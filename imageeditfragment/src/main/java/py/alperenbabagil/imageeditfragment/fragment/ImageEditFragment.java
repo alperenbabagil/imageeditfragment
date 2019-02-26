@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -78,8 +79,8 @@ public class ImageEditFragment extends Fragment{
 
 
     // default values
-    private int currentSecondaryColor = 0xFFFFFFFF;
-    private int currentMainColor = 0xFFAAAAAA;
+    private int currentSecondaryColor = 0xFFDDDDDD;
+    private int currentMainColor = 0xFF000000;
     private String warningString = "Warning";
     private String okString = "OK";
     private String loadingString = "Loading";
@@ -132,6 +133,8 @@ public class ImageEditFragment extends Fragment{
 
         photoEditorView = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.photoEditorView);
 
+
+
         //Back pressed Logic for fragment
         photoEditorView.setFocusableInTouchMode(true);
         photoEditorView.requestFocus();
@@ -182,10 +185,14 @@ public class ImageEditFragment extends Fragment{
                 .setPinchTextScalable(true)
                 .build();
 
+
+
         //default brush size
         photoEditor.setBrushSize(20f);
 
         initLayouts(view);
+
+
 
         photoEditor.setOnPhotoEditorListener(new OnPhotoEditorListener(){
             @Override
@@ -285,6 +292,8 @@ public class ImageEditFragment extends Fragment{
                 }
             }
         });
+
+        photoEditor.setBrushDrawingMode(false);
 
     }
 
@@ -425,10 +434,10 @@ public class ImageEditFragment extends Fragment{
         SeekBar seekBar = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.drawingSeekbar);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            seekBar.getThumb().setTint(currentMainColor);
+            seekBar.getThumb().setTint(0XFFFFFFFF);
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            seekBar.getProgressDrawable().setTint(currentMainColor);
+            seekBar.getProgressDrawable().setTint(0XFFFFFFFF);
         }
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){

@@ -163,6 +163,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+
         android:id="@+id/secondaryColorBar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -171,6 +172,7 @@
         android:visibility="gone"
         >
         <com.divyanshu.colorseekbar.ColorSeekBar
+            app:colorSeeds="@array/barColors"
             android:id="@+id/secondaryColorSeekBar"
             android:layout_width="wrap_content"
             android:layout_height="16dp"
