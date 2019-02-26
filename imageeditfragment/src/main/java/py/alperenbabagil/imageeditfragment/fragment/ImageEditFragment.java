@@ -1,7 +1,6 @@
 package py.alperenbabagil.imageeditfragment.fragment;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Rect;
@@ -26,6 +25,7 @@ import android.widget.TextView;
 import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeProgressDialog;
 import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeWarningDialog;
 import com.awesomedialog.blennersilva.awesomedialoglibrary.interfaces.Closure;
+import com.divyanshu.colorseekbar.ColorSeekBar;
 
 import java.io.File;
 
@@ -41,14 +41,11 @@ import py.alperenbabagil.imageeditfragment.photoeditor.PhotoEditorView;
 import py.alperenbabagil.imageeditfragment.photoeditor.ViewType;
 
 
-public class PhotoEditFragment extends Fragment{
+public class ImageEditFragment extends Fragment{
 
+    //static keys
     public static String SOURCE_TYPE_KEY = "SOURCE_TYPE_KEY";
     public static String SOURCE_DATA_KEY = "SOURCE_DATA_KEY";
-    
-    public static String MAIN_COLORS_DATA_KEY = "MAIN_COLORS_DATA_KEY";
-    public static String SECONDARY_COLORS_DATA_KEY = "SECONDARY_COLORS_DATA_KEY";
-
     public static String WARNING_STRING_KEY = "WARNING_STRING_KEY";
     public static String OK_STRING_KEY = "OK_STRING_KEY";
     public static String LOADING_STRING_KEY = "LOADING_STRING_KEY";
@@ -58,7 +55,6 @@ public class PhotoEditFragment extends Fragment{
     private static int MODE_DRAW = 1;
     private static int MODE_TEXT = 2;
     private static int MODE_INITIAL = 0;
-    private boolean dataTypeIsBitmap = false;
     private int currentMode = 0;
     private boolean canUndo = false;
     private boolean isKeyboardOpen = false;
@@ -68,12 +64,11 @@ public class PhotoEditFragment extends Fragment{
     private PhotoEditor photoEditor;
     private String filePath;
     private RelativeLayout drawingTop;
-    private LinearLayout mainColorBar;
+    private RelativeLayout mainColorBar;
     private LinearLayout textTop;
-    private LinearLayout secondaryColorBar;
+    private RelativeLayout secondaryColorBar;
     private RelativeLayout initialTop;
     private LinearLayout initialBottom;
-    private SeekBar seekBar;
     private ImageView undoBtn;
     private EditText annotationText;
     private View editTextToEdit = null;
@@ -82,16 +77,13 @@ public class PhotoEditFragment extends Fragment{
     private DrawOnFragmentStatus drawOnFragmentStatus;
 
 
-    
-    private int currentSecondaryColor = 0xFF000000;
-    private int currentMainColor = 0xFFFFFFFF;
+    // default values
+    private int currentSecondaryColor = 0xFFFFFFFF;
+    private int currentMainColor = 0xFFAAAAAA;
     private String warningString = "Warning";
     private String okString = "OK";
     private String loadingString = "Loading";
     private String imageWillBeLostString = "Image will be lost";
-    private int[] mainColorList;
-    private int[] secondatyColorList;
-
 
 
     @Nullable
@@ -120,40 +112,22 @@ public class PhotoEditFragment extends Fragment{
             e.printStackTrace();
             return;
         }
-        
-        if(getArguments()!=null){
+
+        if(getArguments() != null){
             if(getArguments().containsKey(WARNING_STRING_KEY))
-                warningString=getArguments().getString(WARNING_STRING_KEY);
+                warningString = getArguments().getString(WARNING_STRING_KEY);
 
             if(getArguments().containsKey(OK_STRING_KEY))
-                okString=getArguments().getString(OK_STRING_KEY);
+                okString = getArguments().getString(OK_STRING_KEY);
 
             if(getArguments().containsKey(LOADING_STRING_KEY))
-                loadingString=getArguments().getString(LOADING_STRING_KEY);
+                loadingString = getArguments().getString(LOADING_STRING_KEY);
 
             if(getArguments().containsKey(IMAGE_WILL_BE_LOST_STRING_KEY))
-                imageWillBeLostString=getArguments().getString(IMAGE_WILL_BE_LOST_STRING_KEY);
-
-            if(getArguments().containsKey(MAIN_COLORS_DATA_KEY)){
-                mainColorList=getArguments().getIntArray(MAIN_COLORS_DATA_KEY);
-            }
-            else{
-                // black,white,red,green,blue,yellow,purple
-                mainColorList = new int[]{0xFF000000,0xFFFFFFFF,0xFFFF0000,0xFF00FF00,0xFF0000FF,0xFFFFFF00,0xFF800080};
-            }
-
-            if(getArguments().containsKey(SECONDARY_COLORS_DATA_KEY)){
-                secondatyColorList=getArguments().getIntArray(SECONDARY_COLORS_DATA_KEY);
-            }
-            else{
-                // purple,yellow,blue,green,red,white,black
-                secondatyColorList = new int[]{0xFF800080,0xFFFFFF00,0xFF0000FF,0xFF00FF00,0xFFFF0000,0xFFFFFFFF,0xFF000000};
-            }
+                imageWillBeLostString = getArguments().getString(IMAGE_WILL_BE_LOST_STRING_KEY);
         }
 
-        
-        
-        
+
         //endregion
 
         photoEditorView = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.photoEditorView);
@@ -247,11 +221,37 @@ public class PhotoEditFragment extends Fragment{
             }
         });
 
+        photoEditor.setBrushColor(currentMainColor);
+
         undoBtn = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.undoBtn);
 
         // setting button click listeners
         initBtnClicks(view);
 
+        ColorSeekBar mainCSB=view.findViewById(py.alperenbabagil.imageeditfragment.R.id.mainColorSeekBar);
+
+        mainCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
+            @Override
+            public void onColorChangeListener(int i){
+                currentMainColor = i;
+                if(currentMode == MODE_DRAW){
+                    photoEditor.setBrushColor(i);
+                }
+                if(currentMode == MODE_TEXT){
+                    annotationText.setTextColor(i);
+                }
+            }
+        });
+
+        ColorSeekBar secondaryCSB=view.findViewById(py.alperenbabagil.imageeditfragment.R.id.secondaryColorSeekBar);
+
+        secondaryCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
+            @Override
+            public void onColorChangeListener(int i){
+                currentSecondaryColor = i;
+                annotationText.setBackgroundColor(i);
+            }
+        });
 
         arrangeViewsByMode();
 
@@ -292,55 +292,31 @@ public class PhotoEditFragment extends Fragment{
     private void initLayouts(View view){
 
         // onTouch events return true because if touch passes to lower view it may cause to unintended drawings
-        drawingTop = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.drawingTop);
-        drawingTop.setOnTouchListener(new View.OnTouchListener(){
+        View.OnTouchListener onTouchListener=new View.OnTouchListener(){
             @Override
             public boolean onTouch(View v,MotionEvent event){
                 return true;
             }
-        });
+        };
 
+        drawingTop = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.drawingTop);
+        drawingTop.setOnTouchListener(onTouchListener);
 
         mainColorBar = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.mainColorBar);
-        mainColorBar.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v,MotionEvent event){
-                return true;
-            }
-        });
+        mainColorBar.setOnTouchListener(onTouchListener);
 
         textTop = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.textTop);
-        textTop.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v,MotionEvent event){
-                return true;
-            }
-        });
+        textTop.setOnTouchListener(onTouchListener);
 
         secondaryColorBar = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.secondaryColorBar);
-        secondaryColorBar.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v,MotionEvent event){
-                return true;
-            }
-        });
+        secondaryColorBar.setOnTouchListener(onTouchListener);
 
         initialTop = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.initialTop);
-        initialTop.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v,MotionEvent event){
-                return true;
-            }
-        });
+        initialTop.setOnTouchListener(onTouchListener);
 
 
         initialBottom = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.initialBottom);
-        initialBottom.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v,MotionEvent event){
-                return true;
-            }
-        });
+        initialBottom.setOnTouchListener(onTouchListener);
 
         annotationText = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.annotationText);
         annotationText.setOnEditorActionListener(new TextView.OnEditorActionListener(){
@@ -353,6 +329,7 @@ public class PhotoEditFragment extends Fragment{
                 return false;
             }
         });
+
         annotationText.setBackgroundColor(currentSecondaryColor);
         annotationText.setTextColor(currentMainColor);
     }
@@ -405,7 +382,8 @@ public class PhotoEditFragment extends Fragment{
             public void onClick(View v){
 
                 final AwesomeProgressDialog awesomeProgressDialog = new AwesomeProgressDialog(getActivity())
-                        .setMessage(loadingString)
+                        .setTitle(loadingString)
+                        .setMessage("")
                         .setCancelable(true);
 
                 awesomeProgressDialog.show();
@@ -444,13 +422,21 @@ public class PhotoEditFragment extends Fragment{
             }
         });
 
-        seekBar = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.drawingSeekbar);
+        SeekBar seekBar = view.findViewById(py.alperenbabagil.imageeditfragment.R.id.drawingSeekbar);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            seekBar.getThumb().setTint(currentMainColor);
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            seekBar.getProgressDrawable().setTint(currentMainColor);
+        }
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
             public void onProgressChanged(SeekBar seekBar,int progress,boolean fromUser){
-                float size = ((float) progress) / 10;
-                photoEditor.setBrushSize(size + 15);
+                float size = ((float) progress) / 8;
+                //to prevent 0 brush size
+                photoEditor.setBrushSize(size + 5);
             }
 
             @Override
@@ -474,9 +460,6 @@ public class PhotoEditFragment extends Fragment{
 
         undoBtn.setOnClickListener(onClickListener);
 
-        // setting main color bar
-        setColorBar(true);
-        setColorBar(false);
     }
 
     private void setUndoButtonsVisibility(){
@@ -485,87 +468,6 @@ public class PhotoEditFragment extends Fragment{
         }
         else{
             undoBtn.setVisibility(View.GONE);
-        }
-
-    }
-
-    private void setColorBar(final boolean isMain){
-
-        int[][] states = new int[][]{
-                new int[]{android.R.attr.state_enabled}, // enabled
-                new int[]{-android.R.attr.state_enabled}, // disabled
-                new int[]{-android.R.attr.state_checked}, // unchecked
-                new int[]{android.R.attr.state_pressed}  // pressed
-        };
-
-        final int[] colors = isMain?mainColorList:secondatyColorList;
-
-        final int margins = GeneralViewHelper.dpToPx(5,getActivity());
-
-        for(int i = 0; i < colors.length; i++){
-            final int index = i;
-            WHEqualView view1 = new WHEqualView(getActivity());
-            LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.WRAP_CONTENT);
-            param.setMargins(margins,0,margins,0);
-            param.gravity = Gravity.CENTER_VERTICAL;
-            param.weight = 1;
-            view1.setLayoutParams(param);
-            view1.setBackgroundResource(py.alperenbabagil.imageeditfragment.R.drawable.circle_background);
-
-            int[] colorss = new int[]{
-                    colors[index],
-                    colors[index],
-                    colors[index],
-                    colors[index]
-            };
-
-            ColorStateList colorStateList = new ColorStateList(states,colorss);
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                view1.setBackgroundTintList(colorStateList);
-            }
-
-            view1.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    if(isMain){
-                        currentMainColor = colors[index];
-                        if(currentMode == MODE_DRAW){
-                            photoEditor.setBrushColor(colors[index]);
-                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                                seekBar.getThumb().setTint(colors[index]);
-                                seekBar.getProgressDrawable().setTint(colors[index]);
-                            }
-                        }
-                        if(currentMode == MODE_TEXT){
-                            annotationText.setTextColor(colors[index]);
-                        }
-                    }
-                    else{
-                        currentSecondaryColor = colors[index];
-                        annotationText.setBackgroundColor(colors[index]);
-                    }
-                }
-            });
-            if(isMain) mainColorBar.addView(view1);
-            else secondaryColorBar.addView(view1);
-        }
-        ImageView view1 = new ImageView(getActivity());
-        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT);
-        param.weight = 1;
-        view1.setLayoutParams(param);
-        if(isMain){
-            view1.setImageResource(py.alperenbabagil.imageeditfragment.R.drawable.baseline_text_format_white_24);
-            mainColorBar.addView(view1);
-            photoEditor.setBrushColor(currentMainColor);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                seekBar.getThumb().setTint(currentMainColor);
-                seekBar.getProgressDrawable().setTint(currentMainColor);
-            }
-        }
-        else{
-            view1.setImageResource(py.alperenbabagil.imageeditfragment.R.drawable.baseline_font_download_white_24);
-            secondaryColorBar.addView(view1);
         }
 
     }
@@ -645,10 +547,6 @@ public class PhotoEditFragment extends Fragment{
             initialTop.setVisibility(View.GONE);
             initialBottom.setVisibility(View.GONE);
         }
-    }
-
-    public void setFilePath(String filePath){
-        this.filePath = filePath;
     }
 
     public enum SourceType{

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawingRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -132,26 +133,61 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/mainColorBar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:background="#838383"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:weightSum="8" />
+        android:background="@drawable/gradient_bg_bottom"
+        android:visibility="visible">
 
-    <LinearLayout
+        <com.divyanshu.colorseekbar.ColorSeekBar
+            app:colorSeeds="@array/barColors"
+            android:id="@+id/mainColorSeekBar"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="1dp"
+            android:layout_toStartOf="@+id/mainCBIcon"
+            android:layout_toRightOf="@+id/mainCBIcon" />
+
+        <ImageView
+            android:id="@+id/mainCBIcon"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/baseline_text_format_white_24" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/secondaryColorBar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_above="@+id/mainColorBar"
-        android:layout_marginBottom="5dp"
-        android:background="#838383"
-        android:orientation="horizontal"
+        android:background="@drawable/gradient_bg"
         android:visibility="gone"
-        android:weightSum="8" />
+        >
+        <com.divyanshu.colorseekbar.ColorSeekBar
+            android:id="@+id/secondaryColorSeekBar"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="1dp"
+            android:layout_toStartOf="@+id/secondaryCBCBIcon"
+            android:layout_toRightOf="@+id/secondaryCBCBIcon" />
+
+        <ImageView
+            android:id="@+id/secondaryCBCBIcon"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/baseline_font_download_white_24" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/annotationText"

@@ -11,25 +11,25 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeProgressDialog;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import py.alperenbabagil.imageeditfragment.fragment.PhotoEditFragment;
+import py.alperenbabagil.imageeditfragment.fragment.ImageEditFragment;
 
 
-public class MainActivity extends AppCompatActivity implements PhotoEditFragment.DrawOnFragmentStatus{
+public class MainActivity extends AppCompatActivity implements ImageEditFragment.DrawOnFragmentStatus{
 
     static final int PERM_REQ_CODE = 136;
     static String PATH;
     String drawedImagePath;
+    LinearLayout buttonLayout;
 
 
     @Override
@@ -62,34 +62,40 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
 
     private void openImageEditFragment(){
 
-        findViewById(R.id.openImage).setVisibility(View.GONE);
-        findViewById(R.id.openFragment).setVisibility(View.GONE);
+        //hiding status bar and action bar to enter full screen
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        try{
+            getSupportActionBar().hide();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+        // prevent buttons to be seen
+        buttonLayout.setVisibility(View.GONE);
 
         Bundle bundle = new Bundle();
 
         //setting data source type
-        bundle.putSerializable(PhotoEditFragment.SOURCE_TYPE_KEY,PhotoEditFragment.SourceType.FILE_PATH);
+        bundle.putSerializable(ImageEditFragment.SOURCE_TYPE_KEY,ImageEditFragment.SourceType.FILE_PATH);
         //setting image path
-        bundle.putString(PhotoEditFragment.SOURCE_DATA_KEY,PATH);
+        bundle.putString(ImageEditFragment.SOURCE_DATA_KEY,PATH);
 
-        int[] clrs={0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
-        bundle.putIntArray(PhotoEditFragment.MAIN_COLORS_DATA_KEY,clrs);
+        //creating fragment
+        ImageEditFragment imageEditFragment = new ImageEditFragment();
 
-        int[] clrsS={0x00000000,0x00000000,0x00000000};
-        bundle.putIntArray(PhotoEditFragment.SECONDARY_COLORS_DATA_KEY,clrsS);
-
-        PhotoEditFragment photoEditFragment = new PhotoEditFragment();
-        photoEditFragment.setArguments(bundle);
+        //setting arguments
+        imageEditFragment.setArguments(bundle);
 
         //putting fragment
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer,photoEditFragment).commitAllowingStateLoss();
+                .add(R.id.fragmentContainer,imageEditFragment).commit();
     }
 
 
+    //putting an example image to external storage
     private boolean writeDrawableToDisk(){
         Bitmap bm = BitmapFactory.decodeResource(getResources(),R.drawable.dp);
-
 
         File imageFile = new File(PATH);
 
@@ -117,7 +123,9 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
 
 
     private void onPermissionsGiven(){
+        //written image's path
         PATH = Environment.getExternalStorageDirectory().getPath() + "/" + "dp.jpg";
+
         // showing loading popup
         final AwesomeProgressDialog awesomeProgressDialog = new AwesomeProgressDialog(this)
                 .setMessage("loading image")
@@ -125,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
 
         awesomeProgressDialog.show();
 
+        buttonLayout=findViewById(R.id.buttonLayout);
+
+        //setting open edited image button click listener
         findViewById(R.id.openImage).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -133,7 +144,6 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
                 }
                 //opening image in gallery
                 else{
-
                     //for demo app. In production, you must implement a file provider
                     if(Build.VERSION.SDK_INT >= 24){
                         try{
@@ -143,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
                             e.printStackTrace();
                         }
                     }
-
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.parse("file://" + drawedImagePath),"image/*");
@@ -160,12 +169,19 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
             }
         });
 
+        findViewById(R.id.resetImage).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //refreshing image
+                awesomeProgressDialog.show();
+                writeDrawableToDisk();
+                awesomeProgressDialog.hide();
+            }
+        });
 
         writeDrawableToDisk();
 
         awesomeProgressDialog.hide();
-
-
     }
 
 
@@ -173,13 +189,11 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[],int[] grantResults){
         switch(requestCode){
-
             case PERM_REQ_CODE:
                 // If request is cancelled, the result arrays are empty.
                 if(grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
                     onPermissionsGiven();
                     break;
                 }
@@ -204,13 +218,19 @@ public class MainActivity extends AppCompatActivity implements PhotoEditFragment
     @Override
     public void drawingCancelled(String path){
         removeFragment();
-
     }
 
     private void removeFragment(){
+        // exiting full screen
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        try{
+            getSupportActionBar().show();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
-        findViewById(R.id.openImage).setVisibility(View.VISIBLE);
-        findViewById(R.id.openFragment).setVisibility(View.VISIBLE);
+        //showing buttons
+        buttonLayout.setVisibility(View.VISIBLE);
 
         //Here we are clearing back stack fragment entries
         int backStackEntry = getSupportFragmentManager().getBackStackEntryCount();

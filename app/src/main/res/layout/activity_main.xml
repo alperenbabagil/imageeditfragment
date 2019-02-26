@@ -6,27 +6,41 @@
     android:layout_height="match_parent"
     >
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"
+        android:layout_centerInParent="true"
+        android:id="@+id/buttonLayout"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/openFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="115dp"
-        android:text="Open image edit fragment" />
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/resetImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset Image" />
 
-    <Button
-        android:id="@+id/openImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="134dp"
-        android:text="Open edited image" />
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/openFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open image edit fragment" />
+
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/openImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open edited image" />
+
+    </LinearLayout>
+
+
 
     <RelativeLayout
-        android:background="@color/white"
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

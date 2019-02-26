@@ -4,4 +4,15 @@
         <!-- {@deprecated Use photo_src instead.} -->
         <attr name="photo_src" format="integer" />
     </declare-styleable>
+
+    <integer-array name="barColors">
+        <item>0xFF000000</item>
+
+        <item>0xFFFF0000</item>
+        <item>0xFF0000FF</item>
+        <item>0xFF00FF00</item>
+        <item>0xFFFFFF00</item>
+        <!--<item>0xFF800080</item>-->
+        <item>0xFFFFFFFF</item>
+    </integer-array>
 </resources>
