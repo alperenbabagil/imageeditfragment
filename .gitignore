@@ -1,12 +1,3 @@
-*.pyc
-telepath_web/.idea/
-telepath_web/telepath/uploads/
-telepath_web/.vagrant/
-
-telepath_web/ubuntu-xenial-16.04-cloudimg-console.log
-
-
-
 
 
 # Built application files
@@ -18,8 +9,6 @@ com_crashlytics_export_strings.xml
 # Local configuration file (sdk path, etc)
 local.properties
 
-# Gradle generated files
-.gradle/
 
 # Signing files
 .signing/
@@ -51,7 +40,7 @@ Thumbs.db
 .idea/dataSources/
 .idea/inspectionProfiles/
 
-/.gradle/
+
 /.idea/
 /app/build/
 /app/release/
