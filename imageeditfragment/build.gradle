@@ -31,8 +31,6 @@ ext {
 android {
     compileSdkVersion 28
 
-
-
     defaultConfig {
 
         minSdkVersion 19
