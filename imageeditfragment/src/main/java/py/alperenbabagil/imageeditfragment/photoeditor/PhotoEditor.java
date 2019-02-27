@@ -29,6 +29,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.annotation.UiThread;
 
+//Modifications copyright (C) 2019 <alperenbabagil>
+
+//changes:
+//152-154: addText method overriden and background color parameter added
+//166: worker addText method decleration changed,added a background color parameter
+//174: texts background changed with this parameter
+
+
 /**
  * <p>
  * This class in initialize by {@link Builder} using a builder pattern with multiple
