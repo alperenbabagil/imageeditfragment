@@ -18,6 +18,29 @@ It is developed for [Telepath] project of [Virasoft] and made public to contribu
 
 ### Installation
 
+To get a Git project into your build:
+
+Step 1. Add the JitPack repository to your build file 
+
+Add it in your root build.gradle at the end of repositories:
+
+```
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+    }
+}
+```
+Step 2. Add the dependency
+
+```
+dependencies {
+    implementation 'com.github.alperenbabagil:imageeditfragment:Tag'
+}
+```
+
+
 ### Usage
 
   To use ImageEditFragment you must implement ImageEditFragment.DrawOnFragmentStatus interface and give neccesary parameters before put the fragment to a view. Example code is given in an Activity:
