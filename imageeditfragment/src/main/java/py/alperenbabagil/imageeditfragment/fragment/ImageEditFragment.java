@@ -1,6 +1,8 @@
 package py.alperenbabagil.imageeditfragment.fragment;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Rect;
@@ -16,26 +18,19 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeProgressDialog;
-import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeWarningDialog;
-import com.awesomedialog.blennersilva.awesomedialoglibrary.interfaces.Closure;
 import com.divyanshu.colorseekbar.ColorSeekBar;
-
 import java.io.File;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import py.alperenbabagil.imageeditfragment.helper.GeneralViewHelper;
-import py.alperenbabagil.imageeditfragment.helper.WHEqualView;
 import py.alperenbabagil.imageeditfragment.photoeditor.OnPhotoEditorListener;
 import py.alperenbabagil.imageeditfragment.photoeditor.PhotoEditor;
 import py.alperenbabagil.imageeditfragment.photoeditor.PhotoEditorView;
@@ -390,12 +385,10 @@ public class ImageEditFragment extends Fragment{
             @Override
             public void onClick(View v){
 
-                final AwesomeProgressDialog awesomeProgressDialog = new AwesomeProgressDialog(getActivity())
-                        .setTitle(loadingString)
-                        .setMessage("")
-                        .setCancelable(true);
+                final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+                        loadingString, true);
 
-                awesomeProgressDialog.show();
+                dialog.show();
 
                 //checking for write permissions
                 if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -418,13 +411,13 @@ public class ImageEditFragment extends Fragment{
                 photoEditor.saveAsFile(filePath,new PhotoEditor.OnSaveListener(){
                     @Override
                     public void onSuccess(@NonNull String imagePath){
-                        awesomeProgressDialog.hide();
+                        dialog.hide();
                         drawOnFragmentStatus.drawingCompleted(true,filePath);
                     }
 
                     @Override
                     public void onFailure(@NonNull Exception exception){
-                        awesomeProgressDialog.hide();
+                        dialog.hide();
                         drawOnFragmentStatus.drawingCompleted(false,filePath);
                     }
                 });
@@ -500,18 +493,30 @@ public class ImageEditFragment extends Fragment{
 
     public void cancelFragment(){
 
-        new AwesomeWarningDialog(getActivity())
-                .setTitle(warningString)
-                .setMessage(imageWillBeLostString)
-                .setCancelable(true)
-                .setButtonText(okString)
-                .setWarningButtonClick(new Closure(){
-                    @Override
-                    public void exec(){
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle(warningString);
+        alertDialog.setMessage(imageWillBeLostString);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, okString,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
                         drawOnFragmentStatus.drawingCancelled(filePath);
+                        dialog.dismiss();
                     }
-                })
-                .show();
+                });
+        alertDialog.show();
+
+//        new AwesomeWarningDialog(getActivity())
+//                .setTitle(warningString)
+//                .setMessage(imageWillBeLostString)
+//                .setCancelable(true)
+//                .setButtonText(okString)
+//                .setWarningButtonClick(new Closure(){
+//                    @Override
+//                    public void exec(){
+//                        drawOnFragmentStatus.drawingCancelled(filePath);
+//                    }
+//                })
+//                .show();
     }
 
     private void arrangeViewsByMode(){

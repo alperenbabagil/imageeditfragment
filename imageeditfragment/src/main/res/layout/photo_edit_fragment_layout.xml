@@ -4,7 +4,7 @@
     android:id="@+id/drawingRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@android:color/black">
 
     <py.alperenbabagil.imageeditfragment.photoeditor.PhotoEditorView
         android:id="@+id/photoEditorView"

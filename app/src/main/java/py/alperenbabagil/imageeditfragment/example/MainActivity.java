@@ -1,5 +1,6 @@
 package py.alperenbabagil.imageeditfragment.example;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -14,7 +15,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.awesomedialog.blennersilva.awesomedialoglibrary.AwesomeProgressDialog;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -127,11 +127,10 @@ public class MainActivity extends AppCompatActivity implements ImageEditFragment
         PATH = Environment.getExternalStorageDirectory().getPath() + "/" + "dp.jpg";
 
         // showing loading popup
-        final AwesomeProgressDialog awesomeProgressDialog = new AwesomeProgressDialog(this)
-                .setMessage("loading image")
-                .setCancelable(true);
+        final ProgressDialog dialog = ProgressDialog.show(this, "",
+                "loading image", true);
 
-        awesomeProgressDialog.show();
+        dialog.show();
 
         buttonLayout=findViewById(R.id.buttonLayout);
 
@@ -173,15 +172,15 @@ public class MainActivity extends AppCompatActivity implements ImageEditFragment
             @Override
             public void onClick(View v){
                 //refreshing image
-                awesomeProgressDialog.show();
+                dialog.show();
                 writeDrawableToDisk();
-                awesomeProgressDialog.hide();
+                dialog.hide();
             }
         });
 
         writeDrawableToDisk();
 
-        awesomeProgressDialog.hide();
+        dialog.hide();
     }
 
 

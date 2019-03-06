@@ -1,1 +1,1 @@
-include ':app', ':imageeditfragment', ':awesomedialoglib'
+include ':app', ':imageeditfragment'
