@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import py.alperenbabagil.imageeditfragment.fragment.ImageEditFragment;
+import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment;
 
 
 public class MainActivity extends AppCompatActivity implements ImageEditFragment.DrawOnFragmentStatus{
