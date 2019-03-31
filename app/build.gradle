@@ -1,4 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.github.dcendents.android-maven'
+
+
+group='com.github.alperenbabagil.imageeditfragment'
+
+
 
 android {
     compileSdkVersion 28
