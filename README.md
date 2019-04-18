@@ -36,7 +36,7 @@ Step 2. Add the dependency
 
 ```
 dependencies {
-    implementation 'com.github.alperenbabagil:imageeditfragment:1.0.8'
+    implementation 'com.github.alperenbabagil:imageeditfragment:1.0.13'
 }
 ```
 
