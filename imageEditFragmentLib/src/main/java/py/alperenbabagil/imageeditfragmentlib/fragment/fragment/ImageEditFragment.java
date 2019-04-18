@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import py.alperenbabagil.imageeditfragmentlib.R;
 import py.alperenbabagil.imageeditfragmentlib.fragment.helper.GeneralViewHelper;
 import py.alperenbabagil.imageeditfragmentlib.fragment.photoeditor.OnPhotoEditorListener;
 import py.alperenbabagil.imageeditfragmentlib.fragment.photoeditor.PhotoEditor;
@@ -86,7 +87,7 @@ public class ImageEditFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,@Nullable ViewGroup container,@Nullable Bundle savedInstanceState){
-        return inflater.inflate(py.alperenbabagil.imageeditfragmentlib.R.layout.photo_edit_fragment_layout,container,false);
+        return inflater.inflate(R.layout.photo_edit_fragment_layout,container,false);
     }
 
     @Override
@@ -127,7 +128,7 @@ public class ImageEditFragment extends Fragment{
 
         //endregion
 
-        photoEditorView = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.photoEditorView);
+        photoEditorView = view.findViewById(R.id.photoEditorView);
 
 
 
@@ -224,12 +225,12 @@ public class ImageEditFragment extends Fragment{
 
         photoEditor.setBrushColor(currentMainColor);
 
-        undoBtn = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.undoBtn);
+        undoBtn = view.findViewById(R.id.undoBtn);
 
         // setting button click listeners
         initBtnClicks(view);
 
-        ColorSeekBar mainCSB=view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.mainColorSeekBar);
+        ColorSeekBar mainCSB=view.findViewById(R.id.mainColorSeekBar);
 
         mainCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
             @Override
@@ -244,7 +245,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        ColorSeekBar secondaryCSB=view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.secondaryColorSeekBar);
+        ColorSeekBar secondaryCSB=view.findViewById(R.id.secondaryColorSeekBar);
 
         secondaryCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
             @Override
@@ -257,13 +258,13 @@ public class ImageEditFragment extends Fragment{
         arrangeViewsByMode();
 
         //listening for keyboard status
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingRoot).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
+        view.findViewById(R.id.drawingRoot).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
             @Override
             public void onGlobalLayout(){
 
                 Rect r = new Rect();
-                view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingRoot).getWindowVisibleDisplayFrame(r);
-                int screenHeight = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingRoot).getRootView().getHeight();
+                view.findViewById(R.id.drawingRoot).getWindowVisibleDisplayFrame(r);
+                int screenHeight = view.findViewById(R.id.drawingRoot).getRootView().getHeight();
 
                 // r.bottom is the position above soft keypad or device button.
                 // if keypad is shown, the r.bottom is smaller than that before.
@@ -302,26 +303,26 @@ public class ImageEditFragment extends Fragment{
             }
         };
 
-        drawingTop = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingTop);
+        drawingTop = view.findViewById(R.id.drawingTop);
         drawingTop.setOnTouchListener(onTouchListener);
 
-        mainColorBar = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.mainColorBar);
+        mainColorBar = view.findViewById(R.id.mainColorBar);
         mainColorBar.setOnTouchListener(onTouchListener);
 
-        textTop = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.textTop);
+        textTop = view.findViewById(R.id.textTop);
         textTop.setOnTouchListener(onTouchListener);
 
-        secondaryColorBar = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.secondaryColorBar);
+        secondaryColorBar = view.findViewById(R.id.secondaryColorBar);
         secondaryColorBar.setOnTouchListener(onTouchListener);
 
-        initialTop = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.initialTop);
+        initialTop = view.findViewById(R.id.initialTop);
         initialTop.setOnTouchListener(onTouchListener);
 
 
-        initialBottom = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.initialBottom);
+        initialBottom = view.findViewById(R.id.initialBottom);
         initialBottom.setOnTouchListener(onTouchListener);
 
-        annotationText = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.annotationText);
+        annotationText = view.findViewById(R.id.annotationText);
         annotationText.setOnEditorActionListener(new TextView.OnEditorActionListener(){
             public boolean onEditorAction(TextView v,int actionId,
                                           KeyEvent event){
@@ -338,7 +339,7 @@ public class ImageEditFragment extends Fragment{
     }
 
     private void initBtnClicks(final View view){
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.penBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.penBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 currentMode = MODE_DRAW;
@@ -347,7 +348,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.textBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.textBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 currentMode = MODE_TEXT;
@@ -356,14 +357,14 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.cancelBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.cancelBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 cancelFragment();
             }
         });
 
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingDoneBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.drawingDoneBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 currentMode = MODE_INITIAL;
@@ -372,7 +373,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.textDoneBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.textDoneBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 textDone();
@@ -380,7 +381,7 @@ public class ImageEditFragment extends Fragment{
         });
 
 
-        view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.saveBtn).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.saveBtn).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
 
@@ -423,7 +424,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        SeekBar seekBar = view.findViewById(py.alperenbabagil.imageeditfragmentlib.R.id.drawingSeekbar);
+        SeekBar seekBar = view.findViewById(R.id.drawingSeekbar);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             seekBar.getThumb().setTint(0XFFFFFFFF);
