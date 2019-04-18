@@ -1,10 +1,12 @@
 package py.alperenbabagil.imageeditfragmentlib.fragment.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 import com.divyanshu.colorseekbar.ColorSeekBar;
 
 import java.io.File;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -128,7 +131,7 @@ public class ImageEditFragment extends Fragment{
 
         //endregion
 
-        photoEditorView = view.findViewById(R.id.photoEditorView);
+        photoEditorView = (PhotoEditorView) view.findViewById(R.id.photoEditorView);
 
 
 
@@ -225,12 +228,12 @@ public class ImageEditFragment extends Fragment{
 
         photoEditor.setBrushColor(currentMainColor);
 
-        undoBtn = view.findViewById(R.id.undoBtn);
+        undoBtn = (ImageView) view.findViewById(R.id.undoBtn);
 
         // setting button click listeners
         initBtnClicks(view);
 
-        ColorSeekBar mainCSB=view.findViewById(R.id.mainColorSeekBar);
+        ColorSeekBar mainCSB=(ColorSeekBar) view.findViewById(R.id.mainColorSeekBar);
 
         mainCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
             @Override
@@ -245,7 +248,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        ColorSeekBar secondaryCSB=view.findViewById(R.id.secondaryColorSeekBar);
+        ColorSeekBar secondaryCSB=(ColorSeekBar) view.findViewById(R.id.secondaryColorSeekBar);
 
         secondaryCSB.setOnColorChangeListener(new ColorSeekBar.OnColorChangeListener(){
             @Override
@@ -293,6 +296,7 @@ public class ImageEditFragment extends Fragment{
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initLayouts(View view){
 
         // onTouch events return true because if touch passes to lower view it may cause to unintended drawings
@@ -303,26 +307,25 @@ public class ImageEditFragment extends Fragment{
             }
         };
 
-        drawingTop = view.findViewById(R.id.drawingTop);
+        drawingTop = (RelativeLayout) view.findViewById(R.id.drawingTop);
         drawingTop.setOnTouchListener(onTouchListener);
 
-        mainColorBar = view.findViewById(R.id.mainColorBar);
+        mainColorBar =  (RelativeLayout) view.findViewById(R.id.mainColorBar);
         mainColorBar.setOnTouchListener(onTouchListener);
 
-        textTop = view.findViewById(R.id.textTop);
+        textTop = (LinearLayout) view.findViewById(R.id.textTop);
         textTop.setOnTouchListener(onTouchListener);
 
-        secondaryColorBar = view.findViewById(R.id.secondaryColorBar);
+        secondaryColorBar =  (RelativeLayout) view.findViewById(R.id.secondaryColorBar);
         secondaryColorBar.setOnTouchListener(onTouchListener);
 
-        initialTop = view.findViewById(R.id.initialTop);
+        initialTop =  (RelativeLayout) view.findViewById(R.id.initialTop);
         initialTop.setOnTouchListener(onTouchListener);
 
-
-        initialBottom = view.findViewById(R.id.initialBottom);
+        initialBottom = (LinearLayout) view.findViewById(R.id.initialBottom);
         initialBottom.setOnTouchListener(onTouchListener);
 
-        annotationText = view.findViewById(R.id.annotationText);
+        annotationText = (EditText) view.findViewById(R.id.annotationText);
         annotationText.setOnEditorActionListener(new TextView.OnEditorActionListener(){
             public boolean onEditorAction(TextView v,int actionId,
                                           KeyEvent event){
@@ -391,7 +394,7 @@ public class ImageEditFragment extends Fragment{
                 dialog.show();
 
                 //checking for write permissions
-                if(ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                if(ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -424,7 +427,7 @@ public class ImageEditFragment extends Fragment{
             }
         });
 
-        SeekBar seekBar = view.findViewById(R.id.drawingSeekbar);
+        SeekBar seekBar = (SeekBar) view.findViewById(R.id.drawingSeekbar);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             seekBar.getThumb().setTint(0XFFFFFFFF);
@@ -493,7 +496,7 @@ public class ImageEditFragment extends Fragment{
 
     public void cancelFragment(){
 
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getActivity())).create();
         alertDialog.setTitle(warningString);
         alertDialog.setMessage(imageWillBeLostString);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, okString,
