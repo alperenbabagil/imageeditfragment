@@ -6,6 +6,7 @@ A fragment to put drawings and text to images like social media apps
   - Move text anywhere you want via dragging.
   - Prevent edited content loss with interrupting back button
   - Ready to use with couple of lines code.
+  - Use image url to edit images from web
 
 It is more like wrapper to [@burhanrashid52]'s [PhotoEditor] library. It ads changing text background color capability and UI within a fragment to PhotoEditor.
 
@@ -36,7 +37,7 @@ Step 2. Add the dependency
 
 ```
 dependencies {
-    implementation 'com.github.alperenbabagil:imageeditfragment:1.0.13'
+    implementation 'com.github.alperenbabagil:imageeditfragment:1.2.0'
 }
 ```
 
@@ -70,7 +71,7 @@ Creating fragment and attaching to a view
 ```java
 Bundle bundle = new Bundle();
 //setting data source type
-bundle.putSerializable(ImageEditFragment.SOURCE_TYPE_KEY,ImageEdit
+bundle.putSerializable(ImageEditFragment.SOURCE_TYPE_KEY,sourceType);
 //setting image path
 bundle.putString(ImageEditFragment.SOURCE_DATA_KEY,PATH);
 //creating fragment
@@ -88,6 +89,7 @@ You can put texts visible to users to bundle like above code with these keys:
 
 SOURCE_TYPE_KEY // look at the ImageEditFragment.SourceType enum
 SOURCE_DATA_KEY // to put data source
+SAVE_IMAGE_PATH_KEY // to save image a different location
 WARNING_STRING_KEY // title of warning popup 
 OK_STRING_KEY = // text at the "OK" button of info popup
 LOADING_STRING_KEY // title of loading popup
