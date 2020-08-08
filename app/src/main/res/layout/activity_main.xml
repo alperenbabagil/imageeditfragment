@@ -36,6 +36,13 @@
             android:layout_height="wrap_content"
             android:text="Open edited image" />
 
+        <Button
+            android:layout_margin="20dp"
+            android:id="@+id/openImageFromUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open url image" />
+
     </LinearLayout>
 
 
