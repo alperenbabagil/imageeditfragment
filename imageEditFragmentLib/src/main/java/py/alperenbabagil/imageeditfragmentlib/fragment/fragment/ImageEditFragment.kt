@@ -27,7 +27,10 @@ import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import com.livinglifetechway.quickpermissions_kotlin.util.QuickPermissionsOptions
 import kotlinx.android.synthetic.main.photo_edit_fragment_layout.*
 import py.alperenbabagil.imageeditfragmentlib.R
-import py.alperenbabagil.imageeditfragmentlib.fragment.helper.GeneralViewHelper.hideKeyboard
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.getParentAsInterface
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.hide
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.hideKeyboard
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.show
 import py.alperenbabagil.imageeditfragmentlib.fragment.photoeditor.OnPhotoEditorListener
 import py.alperenbabagil.imageeditfragmentlib.fragment.photoeditor.PhotoEditor
 import py.alperenbabagil.imageeditfragmentlib.fragment.photoeditor.PhotoEditor.OnSaveListener
@@ -61,7 +64,7 @@ class ImageEditFragment : Fragment(), SapFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var sourceType: SourceType? = null
+        var sourceType: SourceType?
         arguments?.let {
             if (it.containsKey(SOURCE_TYPE_KEY)) {
                 sourceType = it[SOURCE_TYPE_KEY] as SourceType
@@ -147,7 +150,7 @@ class ImageEditFragment : Fragment(), SapFragment {
         }
 
         //building editor
-        photoEditor = PhotoEditor.Builder(activity, photoEditorView)
+        photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)
                 .setPinchTextScalable(true)
                 .build().apply {
                     //default brush size
@@ -175,26 +178,10 @@ class ImageEditFragment : Fragment(), SapFragment {
                     })
                 }
 
-        initLayouts(view)
+        initLayouts()
         // setting button click listeners
-        initBtnClicks(view)
-        mainColorSeekBar.setOnColorChangeListener(object : OnColorChangeListener {
-            override fun onColorChangeListener(i: Int) {
-                currentMainColor = i
-                if (currentMode == MODE_DRAW) {
-                    photoEditor.brushColor = i
-                }
-                if (currentMode == MODE_TEXT) {
-                    annotationText!!.setTextColor(i)
-                }
-            }
-        })
-        secondaryColorSeekBar.setOnColorChangeListener(object : OnColorChangeListener {
-            override fun onColorChangeListener(i: Int) {
-                currentSecondaryColor = i
-                annotationText!!.setBackgroundColor(i)
-            }
-        })
+        initBtnClicks()
+
         arrangeViewsByMode()
 
         //listening for keyboard status
@@ -224,7 +211,7 @@ class ImageEditFragment : Fragment(), SapFragment {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initLayouts(view: View) {
+    private fun initLayouts() {
 
         // onTouch events return true because if touch passes to lower view it may cause to unintended drawings
         val onTouchListener = OnTouchListener { _, _ -> true }
@@ -245,9 +232,27 @@ class ImageEditFragment : Fragment(), SapFragment {
             setBackgroundColor(currentSecondaryColor)
             setTextColor(currentMainColor)
         }
+
+        mainColorSeekBar.setOnColorChangeListener(object : OnColorChangeListener {
+            override fun onColorChangeListener(i: Int) {
+                currentMainColor = i
+                if (currentMode == MODE_DRAW) {
+                    photoEditor.brushColor = i
+                }
+                if (currentMode == MODE_TEXT) {
+                    annotationText!!.setTextColor(i)
+                }
+            }
+        })
+        secondaryColorSeekBar.setOnColorChangeListener(object : OnColorChangeListener {
+            override fun onColorChangeListener(i: Int) {
+                currentSecondaryColor = i
+                annotationText!!.setBackgroundColor(i)
+            }
+        })
     }
 
-    private fun initBtnClicks(view: View) {
+    private fun initBtnClicks() {
         penBtn.setOnClickListener {
             currentMode = MODE_DRAW
             photoEditor.setBrushDrawingMode(true)
@@ -268,23 +273,23 @@ class ImageEditFragment : Fragment(), SapFragment {
         saveBtn.setOnClickListener {
             showLoadingDialog()
             runWithPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, options = QuickPermissionsOptions(permanentDeniedMethod = {
-                (activity as? DrawOnFragmentStatus)?.drawingCompleted(false,
+               getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
                         saveImagePath ?: filePath)
             }, permissionsDeniedMethod = {
-                (activity as? DrawOnFragmentStatus)?.drawingCompleted(false,
+                getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
                         saveImagePath ?: filePath)
             })
             ) {
-                photoEditor.saveAsFile(filePath!!, object : OnSaveListener {
+                photoEditor.saveAsFile(saveImagePath ?: filePath!!, object : OnSaveListener {
                     override fun onSuccess(imagePath: String) {
                         removeCurrentDialog()
-                        (activity as? DrawOnFragmentStatus)?.drawingCompleted(true,
+                        getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(true,
                                 saveImagePath ?: filePath)
                     }
 
                     override fun onFailure(exception: Exception) {
                         removeCurrentDialog()
-                        (activity as? DrawOnFragmentStatus)?.drawingCompleted(false,
+                        getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
                                 saveImagePath ?: filePath)
                     }
                 })
@@ -326,13 +331,15 @@ class ImageEditFragment : Fragment(), SapFragment {
         photoEditor.setBrushDrawingMode(false)
         if (editTextToEdit != null) {
             photoEditor.editText(editTextToEdit, annotationText!!.text.toString(), currentMainColor, currentSecondaryColor)
-            editTextToEdit!!.visibility = View.VISIBLE
+            editTextToEdit?.show()
             editTextToEdit = null
         } else photoEditor.addText(annotationText!!.text.toString(), currentMainColor, currentSecondaryColor)
         canUndo = true
         setUndoButtonsVisibility()
         annotationText.setText("")
-        if (isKeyboardOpen) hideKeyboard(requireActivity())
+        if (isKeyboardOpen){
+            activity?.hideKeyboard()
+        }
         arrangeViewsByMode()
     }
 
@@ -341,48 +348,43 @@ class ImageEditFragment : Fragment(), SapFragment {
                 warningStr = imageWillBeLostString,
                 positiveButtonStr = okString,
                 positiveButtonClick = {
-                    (activity as? DrawOnFragmentStatus)?.drawingCancelled(filePath)
+                    getParentAsInterface<DrawOnFragmentStatus>()?.drawingCancelled(filePath)
                 }
         )
     }
 
     private fun arrangeViewsByMode() {
         if (currentMode == MODE_INITIAL) {
-            annotationText!!.visibility = View.GONE
-            drawingTop!!.visibility = View.GONE
-            mainColorBar!!.visibility = View.GONE
-            textTop!!.visibility = View.GONE
-            secondaryColorBar!!.visibility = View.GONE
-            initialTop!!.visibility = View.VISIBLE
-            initialBottom!!.visibility = View.VISIBLE
+            annotationText.hide()
+            drawingTop.hide()
+            mainColorBar.hide()
+            textTop.hide()
+            secondaryColorBar.hide()
+            initialTop.show()
+            initialBottom.show()
         }
         if (currentMode == MODE_DRAW) {
-            annotationText!!.visibility = View.GONE
-            drawingTop!!.visibility = View.VISIBLE
-            mainColorBar!!.visibility = View.VISIBLE
-            secondaryColorBar!!.visibility = View.GONE
-            textTop!!.visibility = View.GONE
-            initialTop!!.visibility = View.GONE
-            initialBottom!!.visibility = View.GONE
+            annotationText.hide()
+            drawingTop.show()
+            mainColorBar.show()
+            secondaryColorBar.hide()
+            textTop.hide()
+            initialTop.hide()
+            initialBottom.hide()
         }
         if (currentMode == MODE_TEXT) {
-            annotationText!!.visibility = View.VISIBLE
-            drawingTop!!.visibility = View.GONE
-            mainColorBar!!.visibility = View.VISIBLE
-            textTop!!.visibility = View.VISIBLE
-            secondaryColorBar!!.visibility = View.VISIBLE
-            initialTop!!.visibility = View.GONE
-            initialBottom!!.visibility = View.GONE
+            annotationText.show()
+            drawingTop.hide()
+            mainColorBar.show()
+            textTop.show()
+            secondaryColorBar.show()
+            initialTop.hide()
+            initialBottom.hide()
         }
     }
 
     enum class SourceType {
         FILE_PATH, URI, URL
-    }
-
-    interface DrawOnFragmentStatus {
-        fun drawingCompleted(success: Boolean, path: String?)
-        fun drawingCancelled(path: String?)
     }
 
     companion object {

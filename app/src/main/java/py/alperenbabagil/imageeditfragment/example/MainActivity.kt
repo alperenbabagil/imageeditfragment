@@ -1,7 +1,6 @@
 package py.alperenbabagil.imageeditfragment.example
 
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,20 +12,22 @@ import android.os.StrictMode
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alperenbabagil.simpleanimationpopuplibrary.SapActivity
-import com.alperenbabagil.simpleanimationpopuplibrary.showDefaultDialog
 import com.alperenbabagil.simpleanimationpopuplibrary.showLoadingDialog
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import kotlinx.android.synthetic.main.activity_main.*
+import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.DrawOnFragmentStatus
 import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment
-import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment.DrawOnFragmentStatus
 import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment.SourceType
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.hide
+import py.alperenbabagil.imageeditfragmentlib.fragment.helper.show
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.*
+import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
     var drawedImagePath: String? = null
@@ -35,12 +36,20 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        path = getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.path + "/" + "dp.jpg"
+        path = "${getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.path}/dp.jpg"
 
-        showLoadingDialog()
+        runWithPermissions(android.Manifest.permission.WRITE_EXTERNAL_STORAGE){
+            showLoadingDialog()
+            writeDrawableToDisk()
+            currentDialog?.dismiss()
+        }
 
-        //setting open edited image button click listener
-        findViewById<View>(R.id.openImage).setOnClickListener {
+        setUI()
+    }
+
+    private fun setUI(){
+        //edited image
+        openImage.setOnClickListener {
             if (drawedImagePath == null) {
                 Toast.makeText(this@MainActivity, "No edited image", Toast.LENGTH_SHORT).show()
             } else {
@@ -59,47 +68,50 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
                 startActivity(intent)
             }
         }
+
         openFragment.setOnClickListener { openImageEditFragment(path, SourceType.FILE_PATH) }
-        openImageFromUrl.setOnClickListener { openImageEditFragment("https://picsum.photos/600/1200", SourceType.URL,true) }
+
+        openImageFromUrl.setOnClickListener {
+            openImageEditFragment("https://picsum.photos/600/1200",
+                    SourceType.URL,
+                    "getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.path}/${UUID.randomUUID()}.jpg"
+                    )
+        }
+
         resetImage.setOnClickListener { //refreshing image
             showLoadingDialog()
             writeDrawableToDisk()
             currentDialog?.dismiss()
         }
-        writeDrawableToDisk()
-        currentDialog?.dismiss()
+
+        openImageFromUrlInFragment.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, DrawerHolderFragment.newInstance()).commit()
+        }
     }
 
     private fun openImageEditFragment(imagePath: String?,
                                       sourceType: SourceType,
+                                      savePath : String?=null,
                                       hideSaveBtn:Boolean =false
                                       ) {
 
         //hiding status bar and action bar to enter full screen
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        try {
-            supportActionBar!!.hide()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-
-        // prevent buttons to be seen
-        buttonLayout!!.visibility = View.GONE
-        val bundle = Bundle()
-
-        //setting data source type
-        bundle.putSerializable(ImageEditFragment.SOURCE_TYPE_KEY, sourceType)
-        //setting image path
-        bundle.putString(ImageEditFragment.SOURCE_DATA_KEY, imagePath)
-
-        bundle.putBoolean(ImageEditFragment.HIDE_SAVE_BTN_KEY,hideSaveBtn);
+        supportActionBar?.hide()
+        buttonLayout.hide()
 
         //creating fragment
         val imageEditFragment = ImageEditFragment()
-
         //setting arguments
-        imageEditFragment.arguments = bundle
+        imageEditFragment.arguments = Bundle().apply {
+            putSerializable(ImageEditFragment.SOURCE_TYPE_KEY, sourceType)
+            putString(ImageEditFragment.SOURCE_DATA_KEY, imagePath)
+            putBoolean(ImageEditFragment.HIDE_SAVE_BTN_KEY,hideSaveBtn)
+            savePath?.let {
+                putString(ImageEditFragment.SAVE_IMAGE_PATH_KEY,it)
+            }
+        }
 
         //putting fragment
         supportFragmentManager.beginTransaction()
@@ -129,7 +141,6 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
         return false
     }
 
-
     override fun drawingCompleted(success: Boolean, path: String?) {
         drawedImagePath = path
         Toast.makeText(this, "Edited image saved succesfully", Toast.LENGTH_SHORT).show()
@@ -140,17 +151,11 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
         removeFragment()
     }
 
-    private fun removeFragment() {
+    fun removeFragment() {
         // exiting full screen
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        try {
-            supportActionBar!!.show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        //showing buttons
-        buttonLayout!!.visibility = View.VISIBLE
+        supportActionBar?.show()
+        buttonLayout.show()
 
         //Here we are clearing back stack fragment entries
         val backStackEntry = supportFragmentManager.backStackEntryCount
