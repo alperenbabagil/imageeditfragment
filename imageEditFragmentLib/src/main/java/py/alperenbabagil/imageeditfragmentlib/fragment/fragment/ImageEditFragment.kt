@@ -17,6 +17,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.Fragment
 import coil.Coil
+import coil.request.ImageRequest
 import coil.request.LoadRequest
 import com.alperenbabagil.simpleanimationpopuplibrary.SapFragment
 import com.alperenbabagil.simpleanimationpopuplibrary.removeCurrentDialog
@@ -113,14 +114,14 @@ class ImageEditFragment : Fragment(), SapFragment {
                     }
 
                     it.getString(SOURCE_DATA_KEY)?.let {
-                        val request = LoadRequest.Builder(requireContext())
+                        val request = ImageRequest.Builder(requireContext())
                                 .data(it)
                                 .target { drawable ->
                                     photoEditorView.source.setImageDrawable(drawable)
                                 }
                                 .build()
                         val imageLoader = Coil.imageLoader(requireContext())
-                        imageLoader.execute(request)
+                        imageLoader.enqueue(request)
                     }
                 }
             }
