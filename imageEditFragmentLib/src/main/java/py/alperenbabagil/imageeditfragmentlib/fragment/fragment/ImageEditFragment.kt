@@ -344,7 +344,7 @@ class ImageEditFragment : Fragment(), SapFragment {
         arrangeViewsByMode()
     }
 
-    private fun cancelFragment() {
+    fun cancelFragment() {
         showWarningDialog(titleStr = warningString,
                 warningStr = imageWillBeLostString,
                 positiveButtonStr = okString,
