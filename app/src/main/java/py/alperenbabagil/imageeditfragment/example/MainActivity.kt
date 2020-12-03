@@ -5,20 +5,17 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.StrictMode
+import android.os.*
 import android.util.Log
-import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.alperenbabagil.simpleanimationpopuplibrary.SapActivity
+import com.alperenbabagil.simpleanimationpopuplibrary.removeCurrentDialog
 import com.alperenbabagil.simpleanimationpopuplibrary.showLoadingDialog
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import kotlinx.android.synthetic.main.activity_main.*
-import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.DrawOnFragmentStatus
+import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.DrawOnFragmentHost
 import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment
 import py.alperenbabagil.imageeditfragmentlib.fragment.fragment.ImageEditFragment.SourceType
 import py.alperenbabagil.imageeditfragmentlib.fragment.helper.hide
@@ -27,9 +24,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
-import java.util.jar.Manifest
 
-class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
+class MainActivity : AppCompatActivity(), DrawOnFragmentHost,SapActivity {
+
     var drawedImagePath: String? = null
     var path=""
 
@@ -41,7 +38,7 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
         runWithPermissions(android.Manifest.permission.WRITE_EXTERNAL_STORAGE){
             showLoadingDialog()
             writeDrawableToDisk()
-            currentDialog?.dismiss()
+            removeCurrentDialog()
         }
 
         setUI()
@@ -85,9 +82,15 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
         }
 
         openImageFromUrlInFragment.setOnClickListener {
-            supportFragmentManager.beginTransaction()
+            supportFragmentManager.beginTransaction().addToBackStack("url_frag")
                     .replace(R.id.fragmentContainer, DrawerHolderFragment.newInstance()).commit()
         }
+    }
+
+    override fun onBackPressed() {
+        if(supportFragmentManager.backStackEntryCount>0)
+            removeFragment()
+        else super.onBackPressed()
     }
 
     private fun openImageEditFragment(imagePath: String?,
@@ -115,7 +118,9 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
 
         //putting fragment
         supportFragmentManager.beginTransaction()
-                .add(R.id.fragmentContainer, imageEditFragment).commit()
+                .add(R.id.fragmentContainer, imageEditFragment)
+                .addToBackStack("fragment_host")
+                .commit()
     }
 
     //putting an example image to external storage
@@ -149,6 +154,9 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentStatus,SapActivity {
 
     override fun drawingCancelled(path: String?) {
         removeFragment()
+    }
+
+    override fun unsavedChangesClose(fragmentTag: String) {
     }
 
     fun removeFragment() {

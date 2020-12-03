@@ -15,10 +15,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView.OnEditorActionListener
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import coil.Coil
 import coil.request.ImageRequest
-import coil.request.LoadRequest
 import com.alperenbabagil.simpleanimationpopuplibrary.SapFragment
 import com.alperenbabagil.simpleanimationpopuplibrary.removeCurrentDialog
 import com.alperenbabagil.simpleanimationpopuplibrary.showLoadingDialog
@@ -142,8 +142,10 @@ class ImageEditFragment : Fragment(), SapFragment {
             setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        cancelFragment()
-                        return@OnKeyListener true
+                        if(canUndo){
+                            cancelFragment()
+                            return@OnKeyListener true
+                        }
                     }
                 }
                 false
@@ -274,23 +276,23 @@ class ImageEditFragment : Fragment(), SapFragment {
         saveBtn.setOnClickListener {
             showLoadingDialog()
             runWithPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, options = QuickPermissionsOptions(permanentDeniedMethod = {
-               getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
+               getParentAsInterface<DrawOnFragmentHost>()?.drawingCompleted(false,
                         saveImagePath ?: filePath)
             }, permissionsDeniedMethod = {
-                getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
+                getParentAsInterface<DrawOnFragmentHost>()?.drawingCompleted(false,
                         saveImagePath ?: filePath)
             })
             ) {
                 photoEditor.saveAsFile(saveImagePath ?: filePath!!, object : OnSaveListener {
                     override fun onSuccess(imagePath: String) {
                         removeCurrentDialog()
-                        getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(true,
+                        getParentAsInterface<DrawOnFragmentHost>()?.drawingCompleted(true,
                                 saveImagePath ?: filePath)
                     }
 
                     override fun onFailure(exception: Exception) {
                         removeCurrentDialog()
-                        getParentAsInterface<DrawOnFragmentStatus>()?.drawingCompleted(false,
+                        getParentAsInterface<DrawOnFragmentHost>()?.drawingCompleted(false,
                                 saveImagePath ?: filePath)
                     }
                 })
@@ -344,12 +346,13 @@ class ImageEditFragment : Fragment(), SapFragment {
         arrangeViewsByMode()
     }
 
-    fun cancelFragment() {
+    private fun cancelFragment() {
+        getParentAsInterface<DrawOnFragmentHost>()?.unsavedChangesClose(tag ?: "")
         showWarningDialog(titleStr = warningString,
                 warningStr = imageWillBeLostString,
                 positiveButtonStr = okString,
                 positiveButtonClick = {
-                    getParentAsInterface<DrawOnFragmentStatus>()?.drawingCancelled(filePath)
+                    getParentAsInterface<DrawOnFragmentHost>()?.drawingCancelled(filePath)
                 }
         )
     }
@@ -406,4 +409,6 @@ class ImageEditFragment : Fragment(), SapFragment {
     }
 
     override var currentDialogView: View? = null
+
+    override var onBackPressedCallback: OnBackPressedCallback?=null
 }

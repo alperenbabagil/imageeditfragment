@@ -20,11 +20,11 @@ fun View.hide(){
 
 inline fun <reified T> Fragment.getParentAsInterface() : T?{
     return parentFragment?.let {
-        if(it is T) (it as T)
+        if(it is T) (it)
         else null
     } ?: run{
         activity?.let {
-            if(it is T) (it as T)
+            if(it is T) (it)
             else null
         }
     }
