@@ -19,10 +19,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import coil.Coil
 import coil.request.ImageRequest
-import com.alperenbabagil.simpleanimationpopuplibrary.SapFragment
-import com.alperenbabagil.simpleanimationpopuplibrary.removeCurrentDialog
-import com.alperenbabagil.simpleanimationpopuplibrary.showLoadingDialog
-import com.alperenbabagil.simpleanimationpopuplibrary.showWarningDialog
+import com.alperenbabagil.simpleanimationpopuplibrary.*
 import com.divyanshu.colorseekbar.ColorSeekBar.OnColorChangeListener
 import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import com.livinglifetechway.quickpermissions_kotlin.util.QuickPermissionsOptions
@@ -134,23 +131,48 @@ class ImageEditFragment : Fragment(), SapFragment {
             throw Exception("You must provide a bundle")
         }
 
-        photoEditorView.apply {
-            //Back pressed Logic for fragment
-            isFocusableInTouchMode = true
-            requestFocus()
-            //Back key listener
-            setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        if(canUndo){
-                            cancelFragment()
-                            return@OnKeyListener true
-                        }
-                    }
+//        photoEditorView.apply {
+//            //Back pressed Logic for fragment
+//            isFocusableInTouchMode = true
+//            requestFocus()
+//            //Back key listener
+//            setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+//                if (event.action == KeyEvent.ACTION_DOWN) {
+//                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        if(canUndo){
+//                            cancelFragment()
+//                            return@OnKeyListener true
+//                        }
+//                    }
+//                }
+//                false
+//            })
+//        }
+
+        val backCallback= onBackPressedCallback?.apply {isEnabled=true} ?: object :
+                OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+//                currentDialogView?.let {
+//                    if(it.visibility == View.VISIBLE) removeCurrentDialog()
+//                    else {
+//                        this.isEnabled=false
+//                        activity?.onBackPressedDispatcher?.onBackPressed()
+//                    }
+//                } ?: run{
+//                    this.isEnabled=false
+//                    activity?.onBackPressedDispatcher?.onBackPressed()
+//                }
+                if(canUndo){
+                    cancelFragment()
                 }
-                false
-            })
+                else {
+                    this.isEnabled=false
+                    getParentAsInterface<DrawOnFragmentHost>()?.drawingCancelled(filePath)
+                    activity?.onBackPressedDispatcher?.onBackPressed()
+                }
+            }
         }
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner,backCallback)
 
         //building editor
         photoEditor = PhotoEditor.Builder(requireContext(), photoEditorView)

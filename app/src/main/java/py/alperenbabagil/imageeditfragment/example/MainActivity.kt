@@ -88,10 +88,14 @@ class MainActivity : AppCompatActivity(), DrawOnFragmentHost,SapActivity {
     }
 
     override fun onBackPressed() {
-        if(supportFragmentManager.backStackEntryCount>0)
-            removeFragment()
-        else super.onBackPressed()
+        super.onBackPressed()
     }
+
+//    override fun onBackPressed() {
+//        if(supportFragmentManager.backStackEntryCount>0)
+//            removeFragment()
+//        else super.onBackPressed()
+//    }
 
     private fun openImageEditFragment(imagePath: String?,
                                       sourceType: SourceType,

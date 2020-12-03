@@ -37,7 +37,7 @@ class DrawerHolderFragment : Fragment(),DrawOnFragmentHost {
     }
 
     override fun drawingCancelled(path: String?) {
-        Toast.makeText(requireContext(),"Drawing cancelled in fragmentç",Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(),"Drawing cancelled in fragment",Toast.LENGTH_SHORT).show()
         (activity as MainActivity).removeFragment()
     }
 
